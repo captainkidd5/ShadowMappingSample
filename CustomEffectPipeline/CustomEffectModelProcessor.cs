@@ -1,0 +1,49 @@
+﻿using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
+using Microsoft.Xna.Framework.Content.Pipeline.Processors;
+using Microsoft.Xna.Framework.Content.Pipeline;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CustomEffectPipeline
+{
+    /// <summary>
+    /// Overloaded model processor that calls our new material processor.
+    /// </summary>
+    [ContentProcessor]
+    public class CustomEffectModelProcessor : ModelProcessor
+    {
+        [DisplayName("Custom Effect")]
+        [Description("The custom effect applied to the model.")]
+        public string CustomEffect
+        {
+            get { return customEffect; }
+            set { customEffect = value; }
+        }
+        private string customEffect;
+
+        /// <summary>
+        /// Use the CustomEffectMaterialProcessor for all of the materials in the model.
+        /// We pass the processor parameter along to the material processor for the 
+        /// effect file name.
+        /// </summary>
+        protected override MaterialContent ConvertMaterial(MaterialContent material,
+                                                        ContentProcessorContext context)
+        {
+            OpaqueDataDictionary processorParameters = new OpaqueDataDictionary();
+            processorParameters.Add("CustomEffect", customEffect);
+            processorParameters["ColorKeyColor"] = this.ColorKeyColor;
+            processorParameters["ColorKeyEnabled"] = this.ColorKeyEnabled;
+            processorParameters["TextureFormat"] = this.TextureFormat;
+            processorParameters["GenerateMipmaps"] = this.GenerateMipmaps;
+            processorParameters["ResizeTexturesToPowerOfTwo"] =
+                                                        this.ResizeTexturesToPowerOfTwo;
+
+            return context.Convert<MaterialContent, MaterialContent>(material,
+                                  "CustomEffectMaterialProcessor", processorParameters);
+        }
+    }
+}
